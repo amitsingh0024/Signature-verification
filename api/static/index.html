@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signature Verification Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        .success {
+            background-color: #dff0d8;
+            border: 1px solid #d6e9c6;
+            color: #3c763d;
+        }
+        .error {
+            background-color: #f2dede;
+            border: 1px solid #ebccd1;
+            color: #a94442;
+        }
+        .preview {
+            margin-top: 10px;
+            max-width: 200px;
+            max-height: 200px;
+        }
+        .preview img {
+            max-width: 100%;
+            max-height: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Signature Verification Test</h1>
+        
+        <form id="verificationForm">
+            <div class="form-group">
+                <label for="referenceSignature">Reference Signature:</label>
+                <input type="file" id="referenceSignature" accept="image/*" required>
+                <div class="preview" id="referencePreview"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="testSignature">Test Signature:</label>
+                <input type="file" id="testSignature" accept="image/*" required>
+                <div class="preview" id="testPreview"></div>
+            </div>
+            
+            <button type="submit">Verify Signatures</button>
+        </form>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Preview images before upload
+        document.getElementById('referenceSignature').addEventListener('change', function(e) {
+            const preview = document.getElementById('referencePreview');
+            preview.innerHTML = '';
+            if (this.files && this.files[0]) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(this.files[0]);
+                preview.appendChild(img);
+            }
+        });
+
+        document.getElementById('testSignature').addEventListener('change', function(e) {
+            const preview = document.getElementById('testPreview');
+            preview.innerHTML = '';
+            if (this.files && this.files[0]) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(this.files[0]);
+                preview.appendChild(img);
+            }
+        });
+
+        // Handle form submission
+        document.getElementById('verificationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = '';
+            resultDiv.innerHTML = 'Processing...';
+
+            const formData = new FormData();
+            formData.append('reference_signature', document.getElementById('referenceSignature').files[0]);
+            formData.append('test_signature', document.getElementById('testSignature').files[0]);
+
+            try {
+                const response = await fetch('http://localhost:8000/verify', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.className = 'success';
+                    resultDiv.innerHTML = `
+                        <h3>Verification Results:</h3>
+                        <p><strong>Similarity Score:</strong> ${data.similarity_score}</p>
+                        <p><strong>Prediction:</strong> ${data.prediction}</p>
+                        <p><strong>Confidence:</strong> ${data.confidence}</p>
+                    `;
+                } else {
+                    resultDiv.className = 'error';
+                    resultDiv.innerHTML = `<p>Error: ${data.detail || 'Unknown error occurred'}</p>`;
+                }
+            } catch (error) {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html> 
