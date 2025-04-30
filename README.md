@@ -1,4 +1,4 @@
-# Signature Verification System
+3# Signature Verification System
 
 A deep learning-based system for verifying handwritten signatures using Siamese Networks. This project uses a pre-trained ResNet18 backbone to learn signature embeddings and verify if two signatures belong to the same person.
 
@@ -125,13 +125,4 @@ The system provides:
    - Verify your dataset structure matches the expected format
    - Check the CSV file paths in config.py
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- PyTorch team for the ResNet18 implementation
-- The signature dataset providers
-- Contributors to the open-source libraries used in this project
 
