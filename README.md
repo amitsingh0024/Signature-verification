@@ -1,4 +1,4 @@
-3# Signature Verification System
+### Signature Verification System
 
 A deep learning-based system for verifying handwritten signatures using Siamese Networks. This project uses a pre-trained ResNet18 backbone to learn signature embeddings and verify if two signatures belong to the same person.
 
